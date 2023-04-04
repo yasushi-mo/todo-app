@@ -1,8 +1,11 @@
 import express, { Express, Request, Response } from "express";
 import { Todo } from "../types";
+import cors from "cors";
 
 const app: Express = express();
 const port = 3001;
+
+app.use(cors());
 
 const sampleData = [
   { id: 1, title: "牛乳を買う", completed: false },
