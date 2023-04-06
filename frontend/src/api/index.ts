@@ -6,7 +6,7 @@ export const fetcher = async (path: string) => {
     const res = await fetch("http://localhost:3001" + path);
     return res.json();
   } catch (error) {
-    alert(error);
+    console.error(error);
   }
 };
 
