@@ -13,11 +13,11 @@ export const Home: FC = () => {
       <ul>
         {todoList?.map((todo) => (
           <li key={todo.id}>
-            <input
+            {/* <input
               type="checkbox"
               id={String(todo.id)}
               checked={todo.completed}
-            />
+            /> */}
             <label htmlFor={String(todo.id)}>{todo.title}</label>
           </li>
         ))}
