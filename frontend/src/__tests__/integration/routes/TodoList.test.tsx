@@ -1,11 +1,11 @@
 import "@testing-library/jest-dom";
 import { render, screen, waitFor } from "@testing-library/react";
-import { Home } from "../../../routes/Home";
+import { TodoList } from "../../../routes/TodoList";
 import { DUMMY_TODO_LIST } from "../../libs/dummyData";
 
 describe("Home Page test", () => {
   test("Render Home", async () => {
-    render(<Home />);
+    render(<TodoList />);
 
     await waitFor(() => {
       screen.getByRole("heading", { name: "ToDoリスト" });

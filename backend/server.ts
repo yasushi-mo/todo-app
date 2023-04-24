@@ -6,6 +6,7 @@ const app: Express = express();
 const port = 3001;
 
 app.use(cors());
+app.use(express.json());
 
 const sampleData = [
   { id: 1, title: "牛乳を買う", completed: false },
@@ -15,12 +16,68 @@ const sampleData = [
 
 let todoList: Todo[] = sampleData;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World!");
-});
-
+// Get all todo
 app.get("/todo-list", (req: Request, res: Response) => {
   res.json(todoList);
+});
+
+// Get a todo by id
+app.get("/todo-list/:id", (req: Request, res: Response) => {
+  const todoId = Number(req.params.id);
+  const todo = todoList.find((todo) => todo.id === todoId);
+
+  if (!todo) {
+    res.status(404).json({ error: "Not Found" });
+  } else {
+    res.json(todo);
+  }
+});
+
+// Create a new todo
+app.post("/todo-list", (req: Request, res: Response) => {
+  const newTodoTitle = req.body.title;
+  console.log("🚀 ~ file: server.ts:42 ~ app.post ~ req.body:", req.body);
+  const newTodo: Todo = {
+    id: Date.now(),
+    title: newTodoTitle,
+    completed: false,
+  };
+  todoList.push(newTodo);
+
+  res.status(201).json(newTodo);
+});
+
+// Update a todo
+app.put("/todo-list/:id/update", (req: Request, res: Response) => {
+  const updatedTodoId = Number(req.params.id);
+  const updatedTodo = todoList.find((todo) => todo.id === updatedTodoId);
+
+  if (!updatedTodo) return res.status(404).json({ error: "ToDo Not Found" });
+
+  todoList = todoList?.map((todo) =>
+    todo.id === updatedTodo.id
+      ? {
+          id: updatedTodo.id,
+          title: updatedTodo.title,
+          completed: !updatedTodo.completed,
+        }
+      : todo
+  );
+
+  return res.json(todoList);
+});
+
+// Delete a todo
+app.delete("/todo-list/:id", (req: Request, res: Response) => {
+  const todoId = Number(req.params.id);
+  const todoIndex = todoList.findIndex((todo) => todo.id === todoId);
+
+  if (todoIndex === -1) {
+    res.status(404).json({ error: "ToDo Not Found" });
+  } else {
+    todoList.splice(todoIndex, 1);
+    res.sendStatus(204);
+  }
 });
 
 app.listen(port, () => {
