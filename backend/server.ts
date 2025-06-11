@@ -52,7 +52,10 @@ app.put("/todo-list/:id/update", (req: Request, res: Response) => {
   const updatedTodoId = Number(req.params.id);
   const updatedTodo = todoList.find((todo) => todo.id === updatedTodoId);
 
-  if (!updatedTodo) return res.status(404).json({ error: "ToDo Not Found" });
+  if (!updatedTodo) {
+    res.status(404).json({ error: "ToDo Not Found" });
+    return;
+  }
 
   todoList = todoList?.map((todo) =>
     todo.id === updatedTodo.id
@@ -64,7 +67,7 @@ app.put("/todo-list/:id/update", (req: Request, res: Response) => {
       : todo
   );
 
-  return res.json(todoList);
+  res.json(todoList);
 });
 
 // Delete a todo
