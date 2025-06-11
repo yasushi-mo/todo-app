@@ -7,15 +7,15 @@
     "start": "nodemon server.ts"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17",
-    "@types/node": "^18.15.5",
-    "nodemon": "^2.0.22",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.0.2"
+    "@types/express": "5.0.3",
+    "@types/node": "24.0.1",
+    "nodemon": "3.1.10",
+    "ts-node": "10.9.2",
+    "typescript": "5.8.3"
   },
   "dependencies": {
-    "@types/cors": "^2.8.13",
+    "@types/cors": "2.8.19",
     "cors": "^2.8.5",
-    "express": "^4.20.0"
+    "express": "5.1.0"
   }
 }
