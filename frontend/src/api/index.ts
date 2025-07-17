@@ -16,7 +16,7 @@ export const useTodoList = () => useSWR<Todo[]>("/todo-list", fetcher);
 
 export const useGetTodo = () => useSWR<Todo>("/todo-list/:id", fetcher);
 
-export const createTodo = async (newTodo: NewTodo): Promise<Todo> => {
+export const usePostTodo = async (newTodo: NewTodo): Promise<Todo> => {
   const response = await fetch(`${API_ENDPOINT}/todo-list`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
