@@ -1,9 +1,14 @@
 import { ChangeEvent, FC } from "react";
-import { createTodo, useTodoList, useUpdateTodoList } from "../api";
+import { usePostTodo, useTodoList, useUpdateTodoList } from "../api";
 
 export const TodoList: FC = () => {
-  const { data: todoList, error, isLoading } = useTodoList();
+  const { data: todoList, error, isLoading, mutate } = useTodoList();
   const { updateTodoList } = useUpdateTodoList();
+
+  const onCreate = async () => {
+    await usePostTodo({ title: "Learn Express!" });
+    await mutate();
+  };
 
   const onChange = async (event: ChangeEvent<HTMLInputElement>) => {
     await updateTodoList(event.currentTarget.id);
@@ -29,9 +34,7 @@ export const TodoList: FC = () => {
           </li>
         ))}
       </ul>
-      <button onClick={() => createTodo({ title: "Learn Express" })}>
-        Create
-      </button>
+      <button onClick={onCreate}>Create</button>
     </div>
   );
 };
