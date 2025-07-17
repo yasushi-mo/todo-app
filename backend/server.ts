@@ -50,6 +50,7 @@ app.post("/todo-list", (req: Request, res: Response) => {
 // Update a todo
 app.put("/todo-list/:id/update", (req: Request, res: Response) => {
   const updatedTodoId = Number(req.params.id);
+  console.log("🚀 ~ app.put ~ updatedTodoId:", updatedTodoId);
   const updatedTodo = todoList.find((todo) => todo.id === updatedTodoId);
 
   if (!updatedTodo) {

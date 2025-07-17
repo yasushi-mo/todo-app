@@ -10,8 +10,9 @@ export const TodoList: FC = () => {
     await mutate();
   };
 
-  const onChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    await updateTodoList(event.currentTarget.id);
+  const onToggle = async (event: ChangeEvent<HTMLInputElement>) => {
+    await updateTodoList(Number(event.currentTarget.id));
+    await mutate();
   };
 
   if (error) return <div>failed to load</div>;
@@ -28,7 +29,7 @@ export const TodoList: FC = () => {
               id={String(todo.id)}
               value={todo.title}
               checked={todo.completed}
-              onChange={onChange}
+              onChange={onToggle}
             />
             <label htmlFor={String(todo.id)}>{todo.title}</label>
           </li>

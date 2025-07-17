@@ -27,10 +27,9 @@ export const usePostTodo = async (newTodo: NewTodo): Promise<Todo> => {
 };
 
 export const useUpdateTodoList = () => {
-  const UPDATE_PATH = "/todo-list/:id/update";
-  const { data, error } = useSWR(API_ENDPOINT + UPDATE_PATH);
+  const updateTodoList = async (updatedTodoId: number) => {
+    const UPDATE_PATH = `/todo-list/${updatedTodoId}/update`;
 
-  const updateTodoList = async (updatedTodoId: string) => {
     await fetch(API_ENDPOINT + UPDATE_PATH, {
       method: "PUT",
       headers: {
@@ -42,5 +41,5 @@ export const useUpdateTodoList = () => {
     mutate(API_ENDPOINT + UPDATE_PATH);
   };
 
-  return { data, error, updateTodoList };
+  return { updateTodoList };
 };
