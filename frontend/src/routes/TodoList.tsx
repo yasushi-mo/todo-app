@@ -1,12 +1,24 @@
-import { ChangeEvent, FC } from "react";
+import { ChangeEvent, FC, FormEvent } from "react";
 import { usePostTodo, useTodoList, useUpdateTodoList } from "../api";
 
 export const TodoList: FC = () => {
   const { data: todoList, error, isLoading, mutate } = useTodoList();
   const { updateTodoList } = useUpdateTodoList();
 
-  const onCreate = async () => {
-    await usePostTodo({ title: "Learn Express!" });
+  const onCreate = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const formElement = event.currentTarget;
+    const todoInputElement = formElement.elements.namedItem("todo");
+
+    if (!(todoInputElement instanceof HTMLInputElement)) {
+      alert(
+        "Input element with name 'todo' not found or is not an HTMLInputElement."
+      );
+      return;
+    }
+
+    await usePostTodo({ title: todoInputElement.value });
     await mutate();
   };
 
@@ -35,7 +47,14 @@ export const TodoList: FC = () => {
           </li>
         ))}
       </ul>
-      <button onClick={onCreate}>Create</button>
+      <form method="post" onSubmit={onCreate}>
+        <label style={{ marginRight: 8 }}>
+          ToDo 追加
+          <br />
+          <input name="todo" />
+        </label>
+        <button type="submit">追加する</button>
+      </form>
     </div>
   );
 };
