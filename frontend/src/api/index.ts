@@ -4,21 +4,67 @@ import { NewTodo, Todo } from "../../../types/";
 
 export const API_ENDPOINT = "http://localhost:3001";
 
-// ===GET===
-export const fetcher = async (path: string) => {
+// --- Utility Fetchers ---
+
+/** Generic GET fetcher */
+export const getFetcher = async <T>(path: string): Promise<T> => {
   try {
-    const res = await fetch(API_ENDPOINT + path);
-    return res.json();
+    const response = await fetch(`${API_ENDPOINT}${path}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
   } catch (error) {
-    console.error(error);
+    console.error("Fetch error:", error);
+    throw error;
   }
 };
 
-export const useTodoList = () => useSWR<Todo[]>("/todo-list", fetcher);
+type MutationHttpMethod = "POST" | "PUT" | "DELETE";
 
-export const useGetTodo = () => useSWR<Todo>("/todo-list/:id", fetcher);
+/** Generic mutation fetcher for POST, PUT, DELETE */
+export const mutationFetcher = async <T, U>(
+  url: string,
+  { argument, method }: { argument: U; method: MutationHttpMethod }
+): Promise<T> => {
+  const options: RequestInit = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
 
-// ===POST===
+  if (argument) {
+    options.body = JSON.stringify(argument);
+  }
+
+  const response = await fetch(`${API_ENDPOINT}${url}`, options);
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error("Resource Not Found");
+    }
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  // Handle 204 No Content for DELETE or other operations that might not return a body
+  if (response.status === 204) {
+    return null as T; // Return null or undefined for no content
+  }
+
+  return response.json();
+};
+
+// --- SWR Hooks for Data Fetching (GET) ---
+
+export const useTodoList = () => useSWR<Todo[]>("/todo-list", getFetcher);
+
+export const useGetTodo = () => useSWR<Todo>("/todo-list/:id", getFetcher);
+
+// --- SWR Hooks for Data Mutations (POST, PUT, DELETE) ---
+
 export const usePostTodo = async (newTodo: NewTodo): Promise<Todo> => {
   const response = await fetch(`${API_ENDPOINT}/todo-list`, {
     method: "POST",
