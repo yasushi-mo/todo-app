@@ -16,6 +16,7 @@ const sampleData = [
 
 let todoList: Todo[] = sampleData;
 
+// ===GET===
 // Get all todo
 app.get("/todo-list", (req: Request, res: Response) => {
   res.json(todoList);
@@ -33,6 +34,7 @@ app.get("/todo-list/:id", (req: Request, res: Response) => {
   }
 });
 
+// ===POST===
 // Create a new todo
 app.post("/todo-list", (req: Request, res: Response) => {
   const newTodoTitle = req.body.title;
@@ -47,6 +49,7 @@ app.post("/todo-list", (req: Request, res: Response) => {
   res.status(201).json(newTodo);
 });
 
+// ===PUT===
 // Update a todo
 app.put("/todo-list/:id/update", (req: Request, res: Response) => {
   const updatedTodoId = Number(req.params.id);
@@ -71,6 +74,7 @@ app.put("/todo-list/:id/update", (req: Request, res: Response) => {
   res.json(todoList);
 });
 
+// ===DELETE===
 // Delete a todo
 app.delete("/todo-list/:id", (req: Request, res: Response) => {
   const todoId = Number(req.params.id);
