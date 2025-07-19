@@ -1,9 +1,15 @@
 import { ChangeEvent, FC, FormEvent } from "react";
-import { usePostTodo, useTodoList, useUpdateTodoList } from "../api";
+import {
+  useDeleteTodo,
+  usePostTodo,
+  useTodoList,
+  useUpdateTodoList,
+} from "../api";
 
 export const TodoList: FC = () => {
   const { data: todoList, error, isLoading, mutate } = useTodoList();
   const { updateTodoList } = useUpdateTodoList();
+  const { trigger: triggerDelete } = useDeleteTodo();
 
   const onCreate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,6 +33,11 @@ export const TodoList: FC = () => {
     await mutate();
   };
 
+  const onDelete = async (id: number) => {
+    await triggerDelete(id);
+    await mutate();
+  };
+
   if (error) return <div>failed to load</div>;
   if (isLoading) return <div>loading...</div>;
 
@@ -44,16 +55,21 @@ export const TodoList: FC = () => {
               onChange={onToggle}
             />
             <label htmlFor={String(todo.id)}>{todo.title}</label>
+            <button onClick={() => onDelete(todo.id)} style={{ marginLeft: 8 }}>
+              削除
+            </button>
           </li>
         ))}
       </ul>
       <form method="post" onSubmit={onCreate}>
-        <label style={{ marginRight: 8 }}>
+        <label>
           ToDo 追加
           <br />
           <input name="todo" />
         </label>
-        <button type="submit">追加する</button>
+        <button type="submit" style={{ marginLeft: 8 }}>
+          追加
+        </button>
       </form>
     </div>
   );

@@ -79,6 +79,7 @@ app.put("/todo-list/:id/update", (req: Request, res: Response) => {
 app.delete("/todo-list/:id", (req: Request, res: Response) => {
   const todoId = Number(req.params.id);
   const todoIndex = todoList.findIndex((todo) => todo.id === todoId);
+  console.log("🚀 ~ app.delete ~ todoId:", todoId, " ~ todoIndex:", todoIndex);
 
   if (todoIndex === -1) {
     res.status(404).json({ error: "ToDo Not Found" });
