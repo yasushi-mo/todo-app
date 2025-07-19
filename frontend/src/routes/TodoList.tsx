@@ -8,6 +8,7 @@ import {
 
 export const TodoList: FC = () => {
   const { data: todoList, error, isLoading, mutate } = useTodoList();
+  const { trigger: triggerPost } = usePostTodo();
   const { updateTodoList } = useUpdateTodoList();
   const { trigger: triggerDelete } = useDeleteTodo();
 
@@ -24,7 +25,7 @@ export const TodoList: FC = () => {
       return;
     }
 
-    await usePostTodo({ title: todoInputElement.value });
+    await triggerPost({ title: todoInputElement.value });
     await mutate();
   };
 

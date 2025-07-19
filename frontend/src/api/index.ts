@@ -27,7 +27,7 @@ type MutationHttpMethod = "POST" | "PUT" | "DELETE";
 /** Generic mutation fetcher for POST, PUT, DELETE */
 export const mutationFetcher = async <T, U>(
   url: string,
-  { argument, method }: { argument: U; method: MutationHttpMethod }
+  { arg, method }: { arg: U; method: MutationHttpMethod }
 ): Promise<T> => {
   const options: RequestInit = {
     method,
@@ -36,8 +36,8 @@ export const mutationFetcher = async <T, U>(
     },
   };
 
-  if (argument) {
-    options.body = JSON.stringify(argument);
+  if (arg) {
+    options.body = JSON.stringify(arg);
   }
 
   const response = await fetch(`${API_ENDPOINT}${url}`, options);
@@ -65,14 +65,11 @@ export const useGetTodo = () => useSWR<Todo>("/todo-list/:id", getFetcher);
 
 // --- SWR Hooks for Data Mutations (POST, PUT, DELETE) ---
 
-export const usePostTodo = async (newTodo: NewTodo): Promise<Todo> => {
-  const response = await fetch(`${API_ENDPOINT}/todo-list`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(newTodo),
-  });
-  const data = await response.json();
-  return data;
+export const usePostTodo = () => {
+  return useSWRMutation<Todo, Error, string, NewTodo>(
+    "/todo-list",
+    (url, { arg }) => mutationFetcher(url, { arg, method: "POST" })
+  );
 };
 
 // ===PUT===
