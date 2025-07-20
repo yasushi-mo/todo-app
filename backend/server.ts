@@ -85,10 +85,10 @@ app.delete("/todo-list/:id", (req: Request, res: Response) => {
 
   if (todoIndex === -1) {
     res.status(404).json({ error: "ToDo Not Found" });
-  } else {
-    todoList.splice(todoIndex, 1);
-    res.sendStatus(204);
   }
+
+  todoList.splice(todoIndex, 1);
+  res.sendStatus(204);
 });
 
 app.listen(port, () => {

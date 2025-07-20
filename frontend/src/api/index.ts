@@ -87,23 +87,12 @@ export const useUpdateTodoStatus = () =>
   );
 
 // ===DELETE===
-const deleteFetcher = async (url: string, { arg }: { arg: number }) => {
-  const response = await fetch(`${API_ENDPOINT}${url}/${arg}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error("ToDo Not Found");
-    }
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  // Return void for 204 No Content response
-  return;
-};
-
-export const useDeleteTodo = () => useSWRMutation("/todo-list", deleteFetcher);
+export const useDeleteTodo = () =>
+  useSWRMutation<void, Error, string, number>(
+    "/todo-list",
+    (url, { arg: todoId }) =>
+      mutationFetcher<void, undefined>(`${url}/${todoId}`, {
+        arg: undefined,
+        method: "DELETE", // Still no body needed for this DELETE request
+      })
+  );
