@@ -3,13 +3,13 @@ import {
   useDeleteTodo,
   usePostTodo,
   useTodoList,
-  useUpdateTodoList,
+  useUpdateTodoStatus,
 } from "../api";
 
 export const TodoList: FC = () => {
   const { data: todoList, error, isLoading, mutate } = useTodoList();
-  const { trigger: triggerPost } = usePostTodo();
-  const { updateTodoList } = useUpdateTodoList();
+  const { trigger: triggerCreate } = usePostTodo();
+  const { trigger: triggerUpdateStatus } = useUpdateTodoStatus();
   const { trigger: triggerDelete } = useDeleteTodo();
 
   const onCreate = async (event: FormEvent<HTMLFormElement>) => {
@@ -25,12 +25,12 @@ export const TodoList: FC = () => {
       return;
     }
 
-    await triggerPost({ title: todoInputElement.value });
+    await triggerCreate({ title: todoInputElement.value });
     await mutate();
   };
 
-  const onToggle = async (event: ChangeEvent<HTMLInputElement>) => {
-    await updateTodoList(Number(event.currentTarget.id));
+  const onUpdateStatus = async (event: ChangeEvent<HTMLInputElement>) => {
+    await triggerUpdateStatus(Number(event.currentTarget.id));
     await mutate();
   };
 
@@ -53,7 +53,7 @@ export const TodoList: FC = () => {
               id={String(todo.id)}
               value={todo.title}
               checked={todo.completed}
-              onChange={onToggle}
+              onChange={onUpdateStatus}
             />
             <label htmlFor={String(todo.id)}>{todo.title}</label>
             <button onClick={() => onDelete(todo.id)} style={{ marginLeft: 8 }}>

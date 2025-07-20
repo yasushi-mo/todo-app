@@ -1,4 +1,4 @@
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 import { NewTodo, Todo } from "../../../types/";
 
@@ -24,7 +24,10 @@ export const getFetcher = async <T>(path: string): Promise<T> => {
 
 type MutationHttpMethod = "POST" | "PUT" | "DELETE";
 
-/** Generic mutation fetcher for POST, PUT, DELETE */
+/**
+ * Generic mutation fetcher for POST, PUT, DELETE
+ * - 'U' is the type of the argument (the request body/payload, or undefined for no body)
+ **/
 export const mutationFetcher = async <T, U>(
   url: string,
   { arg, method }: { arg: U; method: MutationHttpMethod }
@@ -37,6 +40,7 @@ export const mutationFetcher = async <T, U>(
   };
 
   if (arg) {
+    console.log("arg:", arg, "\nJSON.stringify(arg):", JSON.stringify(arg));
     options.body = JSON.stringify(arg);
   }
 
@@ -64,32 +68,23 @@ export const useTodoList = () => useSWR<Todo[]>("/todo-list", getFetcher);
 export const useGetTodo = () => useSWR<Todo>("/todo-list/:id", getFetcher);
 
 // --- SWR Hooks for Data Mutations (POST, PUT, DELETE) ---
-
-export const usePostTodo = () => {
-  return useSWRMutation<Todo, Error, string, NewTodo>(
-    "/todo-list",
-    (url, { arg }) => mutationFetcher(url, { arg, method: "POST" })
+/** 新規ToDo作成 */
+export const usePostTodo = () =>
+  useSWRMutation<Todo, Error, string, NewTodo>("/todo-list", (url, { arg }) =>
+    mutationFetcher(url, { arg, method: "POST" })
   );
-};
 
 // ===PUT===
-export const useUpdateTodoList = () => {
-  const updateTodoList = async (updatedTodoId: number) => {
-    const UPDATE_PATH = `/todo-list/${updatedTodoId}/update`;
-
-    await fetch(API_ENDPOINT + UPDATE_PATH, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ updatedTodoId }),
-    });
-
-    mutate(API_ENDPOINT + UPDATE_PATH);
-  };
-
-  return { updateTodoList };
-};
+/** ToDoステータス変更 */
+export const useUpdateTodoStatus = () =>
+  useSWRMutation<Todo, Error, string, number>(
+    "/todo-list",
+    (url, { arg: todoId }) =>
+      mutationFetcher<Todo, undefined>(`${url}/${todoId}/update`, {
+        arg: undefined, // Still no body needed for this PUT request
+        method: "PUT",
+      })
+  );
 
 // ===DELETE===
 const deleteFetcher = async (url: string, { arg }: { arg: number }) => {
