@@ -50,7 +50,7 @@ app.post("/todo-list", (req: Request, res: Response) => {
 });
 
 // ===PUT===
-// Update a todo
+// Update a todo status
 app.put("/todo-list/:id/update", (req: Request, res: Response) => {
   const updatedTodoId = Number(req.params.id);
   console.log("🚀 ~ app.put ~ updatedTodoId:", updatedTodoId);
@@ -61,17 +61,19 @@ app.put("/todo-list/:id/update", (req: Request, res: Response) => {
     return;
   }
 
-  todoList = todoList?.map((todo) =>
-    todo.id === updatedTodo.id
-      ? {
-          id: updatedTodo.id,
-          title: updatedTodo.title,
-          completed: !updatedTodo.completed,
-        }
-      : todo
+  /** Create the updated todo item (toggling 'completed') */
+  const updatedTodoItem = {
+    ...updatedTodo,
+    completed: !updatedTodo.completed,
+  };
+
+  // Update the todoList in place or create a new array
+  todoList = todoList.map((todo) =>
+    todo.id === updatedTodoId ? updatedTodoItem : todo
   );
 
-  res.json(todoList);
+  // NOW, send ONLY the updatedTodoItem back
+  res.json(updatedTodoItem);
 });
 
 // ===DELETE===
@@ -83,10 +85,10 @@ app.delete("/todo-list/:id", (req: Request, res: Response) => {
 
   if (todoIndex === -1) {
     res.status(404).json({ error: "ToDo Not Found" });
-  } else {
-    todoList.splice(todoIndex, 1);
-    res.sendStatus(204);
   }
+
+  todoList.splice(todoIndex, 1);
+  res.sendStatus(204);
 });
 
 app.listen(port, () => {
