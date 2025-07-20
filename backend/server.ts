@@ -16,6 +16,7 @@ const sampleData = [
 
 let todoList: Todo[] = sampleData;
 
+// ===GET===
 // Get all todo
 app.get("/todo-list", (req: Request, res: Response) => {
   res.json(todoList);
@@ -33,6 +34,7 @@ app.get("/todo-list/:id", (req: Request, res: Response) => {
   }
 });
 
+// ===POST===
 // Create a new todo
 app.post("/todo-list", (req: Request, res: Response) => {
   const newTodoTitle = req.body.title;
@@ -47,9 +49,11 @@ app.post("/todo-list", (req: Request, res: Response) => {
   res.status(201).json(newTodo);
 });
 
-// Update a todo
+// ===PUT===
+// Update a todo status
 app.put("/todo-list/:id/update", (req: Request, res: Response) => {
   const updatedTodoId = Number(req.params.id);
+  console.log("🚀 ~ app.put ~ updatedTodoId:", updatedTodoId);
   const updatedTodo = todoList.find((todo) => todo.id === updatedTodoId);
 
   if (!updatedTodo) {
@@ -57,30 +61,34 @@ app.put("/todo-list/:id/update", (req: Request, res: Response) => {
     return;
   }
 
-  todoList = todoList?.map((todo) =>
-    todo.id === updatedTodo.id
-      ? {
-          id: updatedTodo.id,
-          title: updatedTodo.title,
-          completed: !updatedTodo.completed,
-        }
-      : todo
+  /** Create the updated todo item (toggling 'completed') */
+  const updatedTodoItem = {
+    ...updatedTodo,
+    completed: !updatedTodo.completed,
+  };
+
+  // Update the todoList in place or create a new array
+  todoList = todoList.map((todo) =>
+    todo.id === updatedTodoId ? updatedTodoItem : todo
   );
 
-  res.json(todoList);
+  // NOW, send ONLY the updatedTodoItem back
+  res.json(updatedTodoItem);
 });
 
+// ===DELETE===
 // Delete a todo
 app.delete("/todo-list/:id", (req: Request, res: Response) => {
   const todoId = Number(req.params.id);
   const todoIndex = todoList.findIndex((todo) => todo.id === todoId);
+  console.log("🚀 ~ app.delete ~ todoId:", todoId, " ~ todoIndex:", todoIndex);
 
   if (todoIndex === -1) {
     res.status(404).json({ error: "ToDo Not Found" });
-  } else {
-    todoList.splice(todoIndex, 1);
-    res.sendStatus(204);
   }
+
+  todoList.splice(todoIndex, 1);
+  res.sendStatus(204);
 });
 
 app.listen(port, () => {

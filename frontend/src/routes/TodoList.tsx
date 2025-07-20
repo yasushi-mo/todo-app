@@ -1,12 +1,42 @@
-import { ChangeEvent, FC } from "react";
-import { createTodo, useTodoList, useUpdateTodoList } from "../api";
+import { ChangeEvent, FC, FormEvent } from "react";
+import {
+  useDeleteTodo,
+  usePostTodo,
+  useTodoList,
+  useUpdateTodoStatus,
+} from "../api";
 
 export const TodoList: FC = () => {
-  const { data: todoList, error, isLoading } = useTodoList();
-  const { updateTodoList } = useUpdateTodoList();
+  const { data: todoList, error, isLoading, mutate } = useTodoList();
+  const { trigger: triggerCreate } = usePostTodo();
+  const { trigger: triggerUpdateStatus } = useUpdateTodoStatus();
+  const { trigger: triggerDelete } = useDeleteTodo();
 
-  const onChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    await updateTodoList(event.currentTarget.id);
+  const onCreate = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const formElement = event.currentTarget;
+    const todoInputElement = formElement.elements.namedItem("todo");
+
+    if (!(todoInputElement instanceof HTMLInputElement)) {
+      alert(
+        "Input element with name 'todo' not found or is not an HTMLInputElement."
+      );
+      return;
+    }
+
+    await triggerCreate({ title: todoInputElement.value });
+    await mutate();
+  };
+
+  const onUpdateStatus = async (event: ChangeEvent<HTMLInputElement>) => {
+    await triggerUpdateStatus(Number(event.currentTarget.id));
+    await mutate();
+  };
+
+  const onDelete = async (id: number) => {
+    await triggerDelete(id);
+    await mutate();
   };
 
   if (error) return <div>failed to load</div>;
@@ -23,15 +53,25 @@ export const TodoList: FC = () => {
               id={String(todo.id)}
               value={todo.title}
               checked={todo.completed}
-              onChange={onChange}
+              onChange={onUpdateStatus}
             />
             <label htmlFor={String(todo.id)}>{todo.title}</label>
+            <button onClick={() => onDelete(todo.id)} style={{ marginLeft: 8 }}>
+              削除
+            </button>
           </li>
         ))}
       </ul>
-      <button onClick={() => createTodo({ title: "Learn Express" })}>
-        Create
-      </button>
+      <form method="post" onSubmit={onCreate}>
+        <label>
+          ToDo 追加
+          <br />
+          <input name="todo" />
+        </label>
+        <button type="submit" style={{ marginLeft: 8 }}>
+          追加
+        </button>
+      </form>
     </div>
   );
 };
